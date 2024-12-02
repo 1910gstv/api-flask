@@ -1,14 +1,9 @@
-from logging import makeLogRecord
-
 from flask_restful import Resource
-from setuptools.config.pyprojecttoml import validate
-
 from api import api
-from ..entidades.curso import Curso
 from ..schemas import curso_schema
 from flask import request, make_response, jsonify
 from ..entidades import curso
-from ..services import curso_service
+from ..services import curso_service, formacao_service
 
 class CursoList(Resource):
     def get(self):
@@ -26,8 +21,11 @@ class CursoList(Resource):
             nome = request.json['nome']
             descricao = request.json['descricao']
             data_publicacao = request.json['data_publicacao']
-
-            novo_curso = curso.Curso(nome=nome, descricao=descricao, data_publicacao=data_publicacao)
+            formacao = request.json['formacao']
+            formacao_curso = formacao_service.listar_formacao_id(formacao)
+            if formacao_curso is None:
+                return make_response(jsonify("Formação Não Foi Encontrada"),404)
+            novo_curso = curso.Curso(nome=nome, descricao=descricao, data_publicacao=data_publicacao,formacao=formacao_curso)
             resultado = curso_service.cadastrar_curso(novo_curso)
             x = cs.jsonify(resultado)
 
@@ -53,7 +51,12 @@ class CursoDetail(Resource):
             nome = request.json['nome']
             descricao = request.json['descricao']
             data_publicacao = request.json['data_publicacao']
-            novo_curso = curso.Curso(nome=nome, descricao=descricao, data_publicacao=data_publicacao)
+            formacao = request.json['formacao']
+            print(formacao)
+            formacao_curso = formacao_service.listar_formacao_id(formacao)
+            if formacao_curso is None:
+                return make_response(jsonify("Formação Não Foi Encontrada"),404)
+            novo_curso = curso.Curso(nome=nome, descricao=descricao, data_publicacao=data_publicacao, formacao=formacao_curso)
             curso_service.atualizar_curso(curso_db, novo_curso)
             curso_atualizado = curso_service.listar_curso_id(id)
             return make_response(cs.jsonify(curso_atualizado), 200)
