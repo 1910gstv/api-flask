@@ -59,5 +59,5 @@ class ProfessorDetail(Resource):
         professor_service.remover_professor(professor_db)
         return make_response(jsonify('Formação excluída com sucesso!'), 204)
 
-api.add_resource(ProfessorList, '/professor')
-api.add_resource(ProfessorDetail,'/professor/<int:id>')
+api.add_resource(ProfessorList, '/professores')
+api.add_resource(ProfessorDetail,'/professores/<int:id>')
